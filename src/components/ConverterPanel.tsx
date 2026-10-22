@@ -1,25 +1,69 @@
+import { useState } from 'react';
 import { useConversion } from '../features/useConversion';
 import { downloadResult } from '../lib/download';
-import type { Converter } from '../types/converter';
+import { formatBytes } from '../lib/formatBytes';
+import type { ConversionOptions, Converter } from '../types/converter';
 import { Dropzone } from './Dropzone';
+import { OptionsForm } from './OptionsForm';
 
 interface ConverterPanelProps {
   converter: Converter;
 }
 
+function getDefaultOptions({ options = [] }: Converter): ConversionOptions {
+  return Object.fromEntries(options.map(({ id, defaultValue }) => [id, defaultValue]));
+}
+
 export function ConverterPanel({ converter }: ConverterPanelProps) {
-  const { state, run } = useConversion(converter);
+  const { state, run, reset } = useConversion(converter);
+  const [file, setFile] = useState<File | null>(null);
+  const [values, setValues] = useState(() => getDefaultOptions(converter));
+  const isConverting = state.status === 'converting';
+
+  const handleFile = (selected: File) => {
+    setFile(selected);
+    reset();
+  };
+
+  const handleOptionsChange = (next: ConversionOptions) => {
+    setValues(next);
+    reset();
+  };
 
   return (
     <section className="panel">
-      <Dropzone accept={converter.accept} disabled={state.status === 'converting'} onFile={run} />
+      <Dropzone accept={converter.accept} disabled={isConverting} onFile={handleFile} />
 
-      {state.status === 'converting' && <p role="status">Converting...</p>}
+      {file && (
+        <p>
+          {file.name} ({formatBytes(file.size)})
+        </p>
+      )}
+
+      {converter.options && (
+        <OptionsForm options={converter.options} values={values} onChange={handleOptionsChange} />
+      )}
+
+      <button
+        type="button"
+        className="action"
+        disabled={!file || isConverting}
+        onClick={() => file && run(file, values)}
+      >
+        Convert
+      </button>
+
+      {isConverting && <p role="status">Converting...</p>}
       {state.status === 'error' && <p role="alert">{state.message}</p>}
       {state.status === 'done' && (
-        <button type="button" className="download" onClick={() => downloadResult(state.result)}>
-          Download {state.result.fileName}
-        </button>
+        <>
+          <p>
+            {formatBytes(state.originalSize)} → {formatBytes(state.result.blob.size)}
+          </p>
+          <button type="button" className="action" onClick={() => downloadResult(state.result)}>
+            Download {state.result.fileName}
+          </button>
+        </>
       )}
     </section>
   );

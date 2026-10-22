@@ -3,9 +3,23 @@ export interface ConversionResult {
   fileName: string;
 }
 
+export type ConversionOptions = Record<string, number>;
+
+export interface ConverterOption {
+  id: string;
+  label: string;
+  input: 'range' | 'number';
+  min: number;
+  max: number;
+  step: number;
+  defaultValue: number;
+  unit?: string;
+}
+
 export interface Converter {
   id: string;
   label: string;
   accept: string;
-  convert: (file: File) => Promise<ConversionResult>;
+  options?: ConverterOption[];
+  convert: (file: File, options: ConversionOptions) => Promise<ConversionResult>;
 }

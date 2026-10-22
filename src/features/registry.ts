@@ -1,5 +1,7 @@
 import type { Converter } from '../types/converter';
+import { compressImage } from './image/compressImage';
 import { createImageConverter } from './image/createImageConverter';
+import { resizeImage } from './image/resizeImage';
 
 export const converters: Converter[] = [
   createImageConverter({
@@ -20,4 +22,6 @@ export const converters: Converter[] = [
     mimeType: 'image/webp',
     extension: 'webp',
   }),
+  compressImage,
+  resizeImage,
 ];
