@@ -5,6 +5,8 @@ import { resizeImage } from './image/resizeImage';
 import { extractPages } from './pdf/extractPages';
 import { imagesToPdf } from './pdf/imagesToPdf';
 import { mergePdf } from './pdf/mergePdf';
+import { pdfToImages } from './pdf/pdfToImages';
+import { pdfToText } from './pdf/pdfToText';
 
 export const converters: Converter[] = [
   createImageConverter({
@@ -32,4 +34,8 @@ export const converters: Converter[] = [
   imagesToPdf,
   mergePdf,
   extractPages,
+  mergePdf,
+  extractPages,
+  pdfToImages,
+  pdfToText,
 ];
