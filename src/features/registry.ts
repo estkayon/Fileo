@@ -7,6 +7,8 @@ import { imagesToPdf } from './pdf/imagesToPdf';
 import { mergePdf } from './pdf/mergePdf';
 import { pdfToImages } from './pdf/pdfToImages';
 import { pdfToText } from './pdf/pdfToText';
+import { markdownToHtml } from './document/markdownToHtml';
+import { wordToHtml } from './document/wordToHtml';
 
 export const converters: Converter[] = [
   createImageConverter({
@@ -38,4 +40,7 @@ export const converters: Converter[] = [
   extractPages,
   pdfToImages,
   pdfToText,
+  pdfToText,
+  wordToHtml,
+  markdownToHtml,
 ];

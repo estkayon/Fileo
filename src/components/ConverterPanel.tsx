@@ -1,11 +1,14 @@
 import { useState } from 'react';
+import { isHtmlBlob } from '../features/document/htmlToPdf';
 import { useConversion } from '../features/useConversion';
 import { downloadResult } from '../lib/download';
+import { buildFileName } from '../lib/fileName';
 import { formatBytes } from '../lib/formatBytes';
 import type { ConversionOptions, Converter } from '../types/converter';
 import { Dropzone } from './Dropzone';
 import { FileList } from './FileList';
 import { OptionsForm } from './OptionsForm';
+import { PdfDownloadButton } from './PdfDownloadButton';
 
 interface ConverterPanelProps {
   converter: Converter;
@@ -70,6 +73,12 @@ export function ConverterPanel({ converter }: ConverterPanelProps) {
           <button type="button" className="action" onClick={() => downloadResult(state.result)}>
             Download {state.result.fileName}
           </button>
+          {isHtmlBlob(state.result.blob) && (
+            <PdfDownloadButton
+              html={state.result.blob}
+              fileName={buildFileName(state.result.fileName, 'pdf')}
+            />
+          )}
         </>
       )}
     </section>

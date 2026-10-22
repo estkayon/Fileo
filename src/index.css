@@ -123,3 +123,7 @@ body {
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+.action + .action {
+  margin-left: 0.5rem;
+}
