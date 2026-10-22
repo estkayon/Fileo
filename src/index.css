@@ -14,3 +14,53 @@ body {
     sans-serif;
   line-height: 1.5;
 }
+
+.app {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.5rem 0;
+}
+
+.tool,
+.download {
+  padding: 0.5rem 1rem;
+  border: 1px solid #c8c8c8;
+  border-radius: 0.5rem;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.tool--active {
+  border-color: #4f46e5;
+  background: #eef2ff;
+}
+
+.download {
+  margin-top: 1rem;
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: #fff;
+}
+
+.dropzone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 10rem;
+  border: 2px dashed #c8c8c8;
+  border-radius: 0.75rem;
+  cursor: pointer;
+}
+
+.dropzone--active {
+  border-color: #4f46e5;
+  background: #eef2ff;
+}
