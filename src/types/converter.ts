@@ -24,3 +24,8 @@ export interface Converter {
   options?: ConverterOption[];
   convert: (files: File[], options: ConversionOptions) => Promise<ConversionResult>;
 }
+
+export interface ToolGroup {
+  title: string;
+  converters: Converter[];
+}

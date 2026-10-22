@@ -38,7 +38,7 @@ export function Dropzone({ accept, multiple, disabled, onFiles }: DropzoneProps)
         accept={accept}
         multiple={multiple}
         disabled={disabled}
-        hidden
+        className="visually-hidden"
         onChange={(event) => {
           emit(event.target.files);
           event.target.value = '';
