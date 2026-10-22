@@ -20,6 +20,7 @@ export interface Converter {
   id: string;
   label: string;
   accept: string;
+  multiple?: boolean;
   options?: ConverterOption[];
-  convert: (file: File, options: ConversionOptions) => Promise<ConversionResult>;
+  convert: (files: File[], options: ConversionOptions) => Promise<ConversionResult>;
 }

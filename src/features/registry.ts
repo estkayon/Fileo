@@ -2,6 +2,9 @@ import type { Converter } from '../types/converter';
 import { compressImage } from './image/compressImage';
 import { createImageConverter } from './image/createImageConverter';
 import { resizeImage } from './image/resizeImage';
+import { extractPages } from './pdf/extractPages';
+import { imagesToPdf } from './pdf/imagesToPdf';
+import { mergePdf } from './pdf/mergePdf';
 
 export const converters: Converter[] = [
   createImageConverter({
@@ -24,4 +27,9 @@ export const converters: Converter[] = [
   }),
   compressImage,
   resizeImage,
+  compressImage,
+  resizeImage,
+  imagesToPdf,
+  mergePdf,
+  extractPages,
 ];

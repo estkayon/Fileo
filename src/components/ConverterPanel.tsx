@@ -4,6 +4,7 @@ import { downloadResult } from '../lib/download';
 import { formatBytes } from '../lib/formatBytes';
 import type { ConversionOptions, Converter } from '../types/converter';
 import { Dropzone } from './Dropzone';
+import { FileList } from './FileList';
 import { OptionsForm } from './OptionsForm';
 
 interface ConverterPanelProps {
@@ -16,12 +17,17 @@ function getDefaultOptions({ options = [] }: Converter): ConversionOptions {
 
 export function ConverterPanel({ converter }: ConverterPanelProps) {
   const { state, run, reset } = useConversion(converter);
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [values, setValues] = useState(() => getDefaultOptions(converter));
   const isConverting = state.status === 'converting';
 
-  const handleFile = (selected: File) => {
-    setFile(selected);
+  const handleFilesAdded = (added: File[]) => {
+    setFiles((current) => (converter.multiple ? [...current, ...added] : added));
+    reset();
+  };
+
+  const handleFilesChange = (next: File[]) => {
+    setFiles(next);
     reset();
   };
 
@@ -32,13 +38,14 @@ export function ConverterPanel({ converter }: ConverterPanelProps) {
 
   return (
     <section className="panel">
-      <Dropzone accept={converter.accept} disabled={isConverting} onFile={handleFile} />
+      <Dropzone
+        accept={converter.accept}
+        multiple={converter.multiple ?? false}
+        disabled={isConverting}
+        onFiles={handleFilesAdded}
+      />
 
-      {file && (
-        <p>
-          {file.name} ({formatBytes(file.size)})
-        </p>
-      )}
+      <FileList files={files} onChange={handleFilesChange} />
 
       {converter.options && (
         <OptionsForm options={converter.options} values={values} onChange={handleOptionsChange} />
@@ -47,8 +54,8 @@ export function ConverterPanel({ converter }: ConverterPanelProps) {
       <button
         type="button"
         className="action"
-        disabled={!file || isConverting}
-        onClick={() => file && run(file, values)}
+        disabled={files.length === 0 || isConverting}
+        onClick={() => run(files, values)}
       >
         Convert
       </button>

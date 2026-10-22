@@ -11,11 +11,12 @@ export function useConversion(converter: Converter) {
   const [state, setState] = useState<ConversionState>({ status: 'idle' });
 
   const run = useCallback(
-    async (file: File, options: ConversionOptions) => {
+    async (files: File[], options: ConversionOptions) => {
       setState({ status: 'converting' });
       try {
-        const result = await converter.convert(file, options);
-        setState({ status: 'done', result, originalSize: file.size });
+        const result = await converter.convert(files, options);
+        const originalSize = files.reduce((total, file) => total + file.size, 0);
+        setState({ status: 'done', result, originalSize });
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Something went wrong.';
         setState({ status: 'error', message });

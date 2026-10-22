@@ -1,5 +1,6 @@
+import { buildFileName } from '../../lib/fileName';
 import type { Converter } from '../../types/converter';
-import { buildFileName, renderImage } from './imageUtils';
+import { renderImage } from './imageUtils';
 
 interface ImageFormat {
   id: string;
@@ -13,7 +14,7 @@ export function createImageConverter(format: ImageFormat): Converter {
     id: format.id,
     label: format.label,
     accept: 'image/*',
-    async convert(file) {
+    async convert([file]) {
       return {
         blob: await renderImage(file, { mimeType: format.mimeType }),
         fileName: buildFileName(file.name, format.extension),

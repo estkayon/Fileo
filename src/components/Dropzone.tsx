@@ -2,12 +2,18 @@ import { useState, type DragEvent } from 'react';
 
 interface DropzoneProps {
   accept: string;
+  multiple: boolean;
   disabled: boolean;
-  onFile: (file: File) => void;
+  onFiles: (files: File[]) => void;
 }
 
-export function Dropzone({ accept, disabled, onFile }: DropzoneProps) {
+export function Dropzone({ accept, multiple, disabled, onFiles }: DropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
+
+  const emit = (list: FileList | null) => {
+    if (disabled || !list || list.length === 0) return;
+    onFiles(multiple ? Array.from(list) : [list[0]]);
+  };
 
   const handleDragOver = (event: DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
@@ -17,8 +23,7 @@ export function Dropzone({ accept, disabled, onFile }: DropzoneProps) {
   const handleDrop = (event: DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
     setIsDragging(false);
-    const file = event.dataTransfer.files[0];
-    if (file && !disabled) onFile(file);
+    emit(event.dataTransfer.files);
   };
 
   return (
@@ -31,15 +36,17 @@ export function Dropzone({ accept, disabled, onFile }: DropzoneProps) {
       <input
         type="file"
         accept={accept}
+        multiple={multiple}
         disabled={disabled}
         hidden
         onChange={(event) => {
-          const file = event.target.files?.[0];
-          if (file) onFile(file);
+          emit(event.target.files);
           event.target.value = '';
         }}
       />
-      <span>Drop a file here or click to browse</span>
+      <span>
+        {multiple ? 'Drop files here or click to browse' : 'Drop a file here or click to browse'}
+      </span>
     </label>
   );
 }

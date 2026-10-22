@@ -1,5 +1,6 @@
+import { buildFileName } from '../../lib/fileName';
 import type { Converter } from '../../types/converter';
-import { buildFileName, renderImage } from './imageUtils';
+import { renderImage } from './imageUtils';
 
 const MIN_SIDE = 16;
 const MAX_SIDE = 8000;
@@ -26,7 +27,7 @@ export const resizeImage: Converter = {
       unit: 'px',
     },
   ],
-  async convert(file, { longestSide }) {
+  async convert([file], { longestSide }) {
     if (!Number.isFinite(longestSide) || longestSide < MIN_SIDE || longestSide > MAX_SIDE) {
       throw new Error(`Enter a size between ${MIN_SIDE} and ${MAX_SIDE} px.`);
     }
