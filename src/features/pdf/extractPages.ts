@@ -6,6 +6,7 @@ export const extractPages: Converter = {
   id: 'pdf-extract-pages',
   label: 'Split PDF',
   accept: 'application/pdf',
+  inputMode: 'single',
   options: [
     {
       id: 'from',

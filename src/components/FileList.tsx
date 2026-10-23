@@ -2,10 +2,11 @@ import { formatBytes } from '../lib/formatBytes';
 
 interface FileListProps {
   files: File[];
+  reorderable: boolean;
   onChange: (files: File[]) => void;
 }
 
-export function FileList({ files, onChange }: FileListProps) {
+export function FileList({ files, reorderable, onChange }: FileListProps) {
   const move = (index: number, offset: number) => {
     const target = index + offset;
     if (target < 0 || target >= files.length) return;
@@ -23,7 +24,7 @@ export function FileList({ files, onChange }: FileListProps) {
           <span className="files__name">
             {file.name} ({formatBytes(file.size)})
           </span>
-          {files.length > 1 && (
+          {reorderable && files.length > 1 && (
             <>
               <button
                 type="button"

@@ -17,7 +17,7 @@ export const imagesToPdf: Converter = {
   id: 'images-to-pdf',
   label: 'Images to PDF',
   accept: 'image/png,image/jpeg',
-  multiple: true,
+  inputMode: 'merge',
   async convert(files) {
     const output = await createPdf();
 

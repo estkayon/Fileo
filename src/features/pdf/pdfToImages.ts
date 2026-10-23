@@ -1,5 +1,6 @@
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 import { buildFileName } from '../../lib/fileName';
+import { zipResults } from '../../lib/zip';
 import type { Converter } from '../../types/converter';
 import { canvasToBlob } from '../image/imageUtils';
 import { withPdf } from './pdfjsUtils';
@@ -20,7 +21,11 @@ async function renderPage(pdf: PDFDocumentProxy, pageNumber: number, scale: numb
   return canvasToBlob(canvas, 'image/png', 1);
 }
 
-async function renderAllPages(file: File, scale: number): Promise<Blob[]> {
+async function renderAllPages(
+  file: File,
+  scale: number,
+  onProgress: (fraction: number) => void,
+): Promise<Blob[]> {
   return withPdf(file, async (pdf) => {
     if (pdf.numPages > MAX_PAGES) {
       throw new Error(
@@ -31,23 +36,21 @@ async function renderAllPages(file: File, scale: number): Promise<Blob[]> {
     const images: Blob[] = [];
     for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
       images.push(await renderPage(pdf, pageNumber, scale));
+      onProgress(pageNumber / pdf.numPages);
     }
     return images;
   });
 }
 
-async function zipImages(images: Blob[], baseName: string): Promise<Blob> {
-  const { zipSync } = await import('fflate');
+function zipImages(images: Blob[], baseName: string): Promise<Blob> {
   const digits = String(images.length).length;
 
-  const entries: Record<string, Uint8Array> = {};
-  for (const [index, image] of images.entries()) {
-    const pageLabel = String(index + 1).padStart(digits, '0');
-    entries[`${baseName}-page-${pageLabel}.png`] = new Uint8Array(await image.arrayBuffer());
-  }
-
-  const zipped = zipSync(entries, { level: 0 });
-  return new Blob([new Uint8Array(zipped)], { type: 'application/zip' });
+  return zipResults(
+    images.map((blob, index) => ({
+      blob,
+      fileName: `${baseName}-page-${String(index + 1).padStart(digits, '0')}.png`,
+    })),
+  );
 }
 
 export const pdfToImages: Converter = {
@@ -66,8 +69,8 @@ export const pdfToImages: Converter = {
       unit: 'x',
     },
   ],
-  async convert([file], { scale }) {
-    const images = await renderAllPages(file, scale);
+  async convert([file], { scale }, { onProgress }) {
+    const images = await renderAllPages(file, scale, onProgress);
 
     if (images.length === 1) {
       return { blob: images[0], fileName: buildFileName(file.name, 'png') };

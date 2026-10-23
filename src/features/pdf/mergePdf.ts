@@ -5,7 +5,7 @@ export const mergePdf: Converter = {
   id: 'pdf-merge',
   label: 'Merge PDFs',
   accept: 'application/pdf',
-  multiple: true,
+  inputMode: 'merge',
   async convert(files) {
     if (files.length < 2) throw new Error('Add at least two PDF files to merge.');
 

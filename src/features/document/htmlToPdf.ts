@@ -66,7 +66,7 @@ async function cropToPng(source: HTMLCanvasElement, height: number): Promise<Arr
   return blob.arrayBuffer();
 }
 
-export async function htmlToPdf(html: Blob): Promise<Blob> {
+export async function htmlToPdf(html: Blob, onProgress: (fraction: number) => void): Promise<Blob> {
   const [{ default: html2canvas }, pdf] = await Promise.all([
     import('html2canvas-pro'),
     createPdf(),
@@ -114,6 +114,7 @@ export async function htmlToPdf(html: Blob): Promise<Blob> {
       });
 
       offset += cutRow / CANVAS_SCALE;
+      onProgress(Math.min(offset / totalHeight, 1));
     }
 
     return await savePdf(pdf);

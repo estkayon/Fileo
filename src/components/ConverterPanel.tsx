@@ -1,14 +1,13 @@
 import { useState } from 'react';
-import { isHtmlBlob } from '../features/document/htmlToPdf';
 import { useConversion } from '../features/useConversion';
-import { downloadResult } from '../lib/download';
-import { buildFileName } from '../lib/fileName';
-import { formatBytes } from '../lib/formatBytes';
 import type { ConversionOptions, Converter } from '../types/converter';
 import { Dropzone } from './Dropzone';
 import { FileList } from './FileList';
 import { OptionsForm } from './OptionsForm';
-import { PdfDownloadButton } from './PdfDownloadButton';
+import { ProgressBar } from './ProgressBar';
+import { ResultList } from './ResultList';
+
+const MAX_FILES = 50;
 
 interface ConverterPanelProps {
   converter: Converter;
@@ -22,15 +21,23 @@ export function ConverterPanel({ converter }: ConverterPanelProps) {
   const { state, run, reset } = useConversion(converter);
   const [files, setFiles] = useState<File[]>([]);
   const [values, setValues] = useState(() => getDefaultOptions(converter));
+  const [notice, setNotice] = useState('');
+
+  const inputMode = converter.inputMode ?? 'batch';
   const isConverting = state.status === 'converting';
+  const convertLabel =
+    inputMode === 'batch' && files.length > 1 ? `Convert ${files.length} files` : 'Convert';
 
   const handleFilesAdded = (added: File[]) => {
-    setFiles((current) => (converter.multiple ? [...current, ...added] : added));
+    const next = inputMode === 'single' ? added : [...files, ...added];
+    setFiles(next.slice(0, MAX_FILES));
+    setNotice(next.length > MAX_FILES ? `Only the first ${MAX_FILES} files were added.` : '');
     reset();
   };
 
   const handleFilesChange = (next: File[]) => {
     setFiles(next);
+    setNotice('');
     reset();
   };
 
@@ -43,16 +50,18 @@ export function ConverterPanel({ converter }: ConverterPanelProps) {
     <section className="panel">
       <Dropzone
         accept={converter.accept}
-        multiple={converter.multiple ?? false}
+        multiple={inputMode !== 'single'}
         disabled={isConverting}
         onFiles={handleFilesAdded}
       />
+      {notice && <p role="status">{notice}</p>}
 
-      <FileList files={files} onChange={handleFilesChange} />
-
-      {converter.options && (
-        <OptionsForm options={converter.options} values={values} onChange={handleOptionsChange} />
-      )}
+      <fieldset className="controls" disabled={isConverting}>
+        <FileList files={files} reorderable={inputMode === 'merge'} onChange={handleFilesChange} />
+        {converter.options && (
+          <OptionsForm options={converter.options} values={values} onChange={handleOptionsChange} />
+        )}
+      </fieldset>
 
       <button
         type="button"
@@ -60,27 +69,13 @@ export function ConverterPanel({ converter }: ConverterPanelProps) {
         disabled={files.length === 0 || isConverting}
         onClick={() => run(files, values)}
       >
-        Convert
+        {convertLabel}
       </button>
 
-      {isConverting && <p role="status">Converting...</p>}
-      {state.status === 'error' && <p role="alert">{state.message}</p>}
-      {state.status === 'done' && (
-        <>
-          <p>
-            {formatBytes(state.originalSize)} → {formatBytes(state.result.blob.size)}
-          </p>
-          <button type="button" className="action" onClick={() => downloadResult(state.result)}>
-            Download {state.result.fileName}
-          </button>
-          {isHtmlBlob(state.result.blob) && (
-            <PdfDownloadButton
-              html={state.result.blob}
-              fileName={buildFileName(state.result.fileName, 'pdf')}
-            />
-          )}
-        </>
+      {state.status === 'converting' && (
+        <ProgressBar progress={state.progress} completed={state.completed} total={state.total} />
       )}
+      {state.status === 'done' && <ResultList items={state.items} />}
     </section>
   );
 }

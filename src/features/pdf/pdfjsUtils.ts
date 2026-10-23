@@ -2,8 +2,8 @@ import type { PDFDocumentProxy } from 'pdfjs-dist';
 
 async function loadPdfjs() {
   const [pdfjs, { default: workerSrc }] = await Promise.all([
-    import('pdfjs-dist'),
-    import('pdfjs-dist/build/pdf.worker.min.mjs?url'),
+    import('pdfjs-dist/legacy/build/pdf.mjs'),
+    import('pdfjs-dist/legacy/build/pdf.worker.min.mjs?url'),
   ]);
   pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
   return pdfjs;

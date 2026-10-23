@@ -17,11 +17,12 @@ export const pdfToText: Converter = {
   id: 'pdf-to-text',
   label: 'PDF to text',
   accept: 'application/pdf',
-  async convert([file]) {
+  async convert([file], _options, { onProgress }) {
     const text = await withPdf(file, async (pdf) => {
       const pages: string[] = [];
       for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
         pages.push(await extractPageText(pdf, pageNumber));
+        onProgress(pageNumber / pdf.numPages);
       }
       return pages.join('\n\n').trim();
     });
