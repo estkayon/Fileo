@@ -4,20 +4,12 @@ import { zipResults } from '../../lib/zip';
 import type { Converter } from '../../types/converter';
 import { canvasToBlob } from '../image/imageUtils';
 import { withPdf } from './pdfjsUtils';
+import { renderPageToCanvas } from './renderPage';
 
 const MAX_PAGES = 100;
 
 async function renderPage(pdf: PDFDocumentProxy, pageNumber: number, scale: number): Promise<Blob> {
-  const page = await pdf.getPage(pageNumber);
-  const viewport = page.getViewport({ scale });
-
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.ceil(viewport.width);
-  canvas.height = Math.ceil(viewport.height);
-
-  await page.render({ canvas, viewport }).promise;
-  page.cleanup();
-
+  const canvas = await renderPageToCanvas(pdf, pageNumber, { scale });
   return canvasToBlob(canvas, 'image/png', 1);
 }
 

@@ -28,6 +28,7 @@ export function FileList({ files, reorderable, onChange }: FileListProps) {
             <>
               <button
                 type="button"
+                className="icon-button"
                 aria-label={`Move ${file.name} up`}
                 disabled={index === 0}
                 onClick={() => move(index, -1)}
@@ -36,6 +37,7 @@ export function FileList({ files, reorderable, onChange }: FileListProps) {
               </button>
               <button
                 type="button"
+                className="icon-button"
                 aria-label={`Move ${file.name} down`}
                 disabled={index === files.length - 1}
                 onClick={() => move(index, 1)}
@@ -44,7 +46,12 @@ export function FileList({ files, reorderable, onChange }: FileListProps) {
               </button>
             </>
           )}
-          <button type="button" aria-label={`Remove ${file.name}`} onClick={() => remove(index)}>
+          <button
+            type="button"
+            className="icon-button"
+            aria-label={`Remove ${file.name}`}
+            onClick={() => remove(index)}
+          >
             ✕
           </button>
         </li>

@@ -1,11 +1,10 @@
-import { useState } from 'react';
-import { ConverterPanel } from './components/ConverterPanel';
+import { Fragment, useState } from 'react';
 import { ToolSelector } from './components/ToolSelector';
-import { converters, toolGroups } from './features/registry';
+import { toolGroups, tools } from './tools';
 
 function App() {
-  const [selectedId, setSelectedId] = useState(converters[0].id);
-  const selected = converters.find(({ id }) => id === selectedId) ?? converters[0];
+  const [selectedId, setSelectedId] = useState(tools[0].id);
+  const selected = tools.find(({ id }) => id === selectedId) ?? tools[0];
 
   return (
     <main className="app">
@@ -16,7 +15,7 @@ function App() {
         </p>
       </header>
       <ToolSelector groups={toolGroups} selectedId={selected.id} onSelect={setSelectedId} />
-      <ConverterPanel key={selected.id} converter={selected} />
+      <Fragment key={selected.id}>{selected.render()}</Fragment>
     </main>
   );
 }

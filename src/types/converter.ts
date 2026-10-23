@@ -41,7 +41,7 @@ export interface Converter {
   ) => Promise<ConversionResult>;
 }
 
-export interface ToolGroup {
+export interface ConverterGroup {
   title: string;
   converters: Converter[];
 }

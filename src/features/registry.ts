@@ -1,4 +1,4 @@
-import type { ToolGroup } from '../types/converter';
+import type { ConverterGroup } from '../types/converter';
 import { markdownToHtml } from './document/markdownToHtml';
 import { createImageConverter } from './image/createImageConverter';
 import { compressImage } from './image/compressImage';
@@ -10,7 +10,7 @@ import { pdfToImages } from './pdf/pdfToImages';
 import { pdfToText } from './pdf/pdfToText';
 import { wordToHtml } from './document/wordToHtml';
 
-export const toolGroups: ToolGroup[] = [
+export const converterGroups: ConverterGroup[] = [
   {
     title: 'Image',
     converters: [
@@ -45,5 +45,3 @@ export const toolGroups: ToolGroup[] = [
     converters: [wordToHtml, markdownToHtml],
   },
 ];
-
-export const converters = toolGroups.flatMap((group) => group.converters);
