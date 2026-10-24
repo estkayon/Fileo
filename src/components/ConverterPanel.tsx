@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useConversion } from '../features/useConversion';
 import type { ConversionOptions, Converter } from '../types/converter';
 import { ConversionOutput } from './ConversionOutput';
@@ -8,6 +8,8 @@ import { OptionsForm } from './OptionsForm';
 import { ProgressBar } from './ProgressBar';
 
 const MAX_FILES = 50;
+/** Same width as the CSS breakpoint where the result moves below the form. */
+const STACKED_LAYOUT = '(max-width: 60rem)';
 
 interface ConverterPanelProps {
   converter: Converter;
@@ -22,11 +24,22 @@ export function ConverterPanel({ converter }: ConverterPanelProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [values, setValues] = useState(() => getDefaultOptions(converter));
   const [notice, setNotice] = useState('');
+  const outputRef = useRef<HTMLElement>(null);
 
   const inputMode = converter.inputMode ?? 'batch';
   const isConverting = state.status === 'converting';
   const convertLabel =
     inputMode === 'batch' && files.length > 1 ? `Convert ${files.length} files` : 'Convert';
+
+  // On small screens the result sits below the form, so bring it into view when it is ready.
+  useEffect(() => {
+    if (state.status !== 'done' || !window.matchMedia(STACKED_LAYOUT).matches) return;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    outputRef.current?.scrollIntoView({
+      behavior: reduceMotion ? 'auto' : 'smooth',
+      block: 'start',
+    });
+  }, [state.status]);
 
   const handleFilesAdded = (added: File[]) => {
     const next = inputMode === 'single' ? added : [...files, ...added];
@@ -82,11 +95,16 @@ export function ConverterPanel({ converter }: ConverterPanelProps) {
         </button>
       </section>
 
-      <section className="panel workspace__output" aria-label="Result" aria-live="polite">
+      <section
+        ref={outputRef}
+        className={`panel workspace__output${state.status === 'idle' ? ' workspace__output--idle' : ''}`}
+        aria-label="Result"
+        aria-live="polite"
+      >
         {state.status === 'idle' && (
           <p className="output__empty">
             {files.length === 0
-              ? 'Add a file on the left, then press Convert. The result shows here.'
+              ? 'Add a file, then press Convert. The result shows here.'
               : 'Press Convert to see the result here.'}
           </p>
         )}

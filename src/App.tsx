@@ -22,6 +22,7 @@ function App() {
       {tool ? <ToolPage key={tool.id} tool={tool} /> : <HomePage />}
       <footer className="site-footer">
         <p>Fileo is free to use. Your files are processed on your device and never uploaded.</p>
+        <p>© {new Date().getFullYear()} Md. Estiak Rahman Ayon. All rights reserved.</p>
       </footer>
     </>
   );

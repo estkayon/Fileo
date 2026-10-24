@@ -34,6 +34,7 @@
   --radius-lg: 1rem;
   --page-width: 72rem;
   --tool-width: 48rem;
+  --header-height: 4rem;
 }
 
 :root[data-theme='dark'] {
@@ -109,23 +110,38 @@ textarea:focus-visible {
   color: var(--danger);
 }
 
-/* ---------- Header, logo, footer ---------- */
+/* ---------- Header, navigation, footer ---------- */
 
 .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   border-bottom: 1px solid var(--line);
   background: var(--surface);
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Once the page scrolls, the header turns see-through and blurs what passes under it. */
+.site-header--scrolled {
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  box-shadow: 0 2px 12px rgb(16 40 28 / 0.08);
+  backdrop-filter: saturate(160%) blur(12px);
 }
 
 .site-header__inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 1.75rem;
   max-width: var(--page-width);
+  height: var(--header-height);
   margin: 0 auto;
-  padding: 0.75rem 1.25rem;
+  padding: 0 1.25rem;
 }
 
 .site-header__home {
+  flex-shrink: 0;
   color: inherit;
   text-decoration: none;
   border-radius: var(--radius-sm);
@@ -168,8 +184,100 @@ textarea:focus-visible {
   stroke-linejoin: round;
 }
 
+.nav {
+  flex: 1;
+}
+
+.nav__menu-button {
+  display: none;
+}
+
+.nav__groups {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav__group {
+  position: relative;
+}
+
+.nav__group-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.nav__group-button:hover,
+.nav__group-button[aria-expanded='true'] {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.nav__chevron {
+  transition: transform 0.15s ease;
+}
+
+.nav__group-button[aria-expanded='true'] .nav__chevron {
+  transform: rotate(180deg);
+}
+
+.nav__panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  display: grid;
+  min-width: 15rem;
+  margin: 0;
+  padding: 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 12px 32px rgb(16 40 28 / 0.14);
+  list-style: none;
+}
+
+.nav__panel[hidden] {
+  display: none;
+}
+
+.nav__link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* A small square in the tool family's shade of green. */
+.nav__link::before {
+  flex-shrink: 0;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 2px;
+  background: var(--cat);
+  content: '';
+}
+
+.nav__link:hover {
+  background: var(--primary-soft);
+}
+
 .theme-toggle {
   display: grid;
+  flex-shrink: 0;
   place-items: center;
   width: 2.5rem;
   height: 2.5rem;
@@ -187,6 +295,8 @@ textarea:focus-visible {
 }
 
 .theme-toggle svg,
+.nav__menu-button svg,
+.nav__chevron,
 .back-link svg,
 .tool-card__arrow {
   fill: none;
@@ -197,16 +307,41 @@ textarea:focus-visible {
 }
 
 .site-footer {
+  display: grid;
+  gap: 0.35rem;
   max-width: var(--page-width);
   margin: 4rem auto 0;
   padding: 1.5rem 1.25rem 2.5rem;
   border-top: 1px solid var(--line);
   color: var(--muted);
   font-size: 0.875rem;
+  text-align: center;
 }
 
 .site-footer p {
   margin: 0;
+}
+
+/* ---------- Tool families ---------- */
+
+.tool-card--image,
+.nav__group--image {
+  --cat: var(--cat-image);
+}
+
+.tool-card--pdf,
+.nav__group--pdf {
+  --cat: var(--cat-pdf);
+}
+
+.tool-card--document,
+.nav__group--document {
+  --cat: var(--cat-document);
+}
+
+.tool-card--edit,
+.nav__group--edit {
+  --cat: var(--cat-edit);
 }
 
 /* ---------- Home ---------- */
@@ -219,11 +354,12 @@ textarea:focus-visible {
 
 .hero {
   padding: 3.5rem 0 2rem;
+  text-align: center;
 }
 
 .hero__title {
   max-width: 18ch;
-  margin: 0;
+  margin: 0 auto;
   font-family: var(--font-display);
   font-size: clamp(2.25rem, 1.5rem + 3vw, 3.75rem);
   font-weight: 500;
@@ -233,7 +369,7 @@ textarea:focus-visible {
 
 .hero__lead {
   max-width: 34rem;
-  margin: 1.25rem 0 0;
+  margin: 1.25rem auto 0;
   color: var(--muted);
   font-size: 1.125rem;
 }
@@ -241,6 +377,7 @@ textarea:focus-visible {
 .filters {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.5rem;
   margin-bottom: 1rem;
 }
@@ -268,19 +405,23 @@ textarea:focus-visible {
 }
 
 .tool-section {
-  margin-top: 2rem;
+  margin-top: 2.25rem;
+  scroll-margin-top: calc(var(--header-height) + 1rem);
 }
 
 .tool-section__title {
-  margin: 0 0 0.85rem;
+  margin: 0 0 1rem;
   font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 500;
+  text-align: center;
 }
 
+/* Cards wrap from the centre, so a short last row stays centred too. */
 .tool-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 0.85rem;
   margin: 0;
   padding: 0;
@@ -289,22 +430,7 @@ textarea:focus-visible {
 
 .tool-grid li {
   display: flex;
-}
-
-.tool-card--image {
-  --cat: var(--cat-image);
-}
-
-.tool-card--pdf {
-  --cat: var(--cat-pdf);
-}
-
-.tool-card--document {
-  --cat: var(--cat-document);
-}
-
-.tool-card--edit {
-  --cat: var(--cat-edit);
+  flex: 0 1 16.5rem;
 }
 
 .tool-card {
@@ -360,6 +486,76 @@ textarea:focus-visible {
   line-height: 1.45;
 }
 
+/* ---------- Narrow screens: tools move into a menu ---------- */
+
+@media (max-width: 52rem) {
+  .site-header__inner {
+    gap: 0.75rem;
+  }
+
+  .nav {
+    flex: 0;
+    order: 3;
+  }
+
+  .site-header .theme-toggle {
+    margin-left: auto;
+  }
+
+  .nav__menu-button {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .nav__groups {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    display: none;
+    max-height: calc(100dvh - var(--header-height));
+    padding: 0.5rem 1rem 1rem;
+    overflow-y: auto;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+    box-shadow: 0 12px 24px rgb(16 40 28 / 0.12);
+  }
+
+  .nav__groups--open {
+    display: grid;
+  }
+
+  .nav__group-button {
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.75rem 0.5rem;
+    font-size: 1.0625rem;
+  }
+
+  .nav__panel {
+    position: static;
+    min-width: 0;
+    padding: 0 0 0.5rem 0.5rem;
+    border: 0;
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header,
+  .nav__chevron {
+    transition: none;
+  }
+}
+
 /* ---------- Tool page ---------- */
 
 .tool-page {
@@ -412,7 +608,7 @@ textarea:focus-visible {
 
 .workspace__output {
   position: sticky;
-  top: 1rem;
+  top: calc(var(--header-height) + 1rem);
   display: grid;
   gap: 1rem;
   min-height: 18rem;
@@ -497,6 +693,12 @@ textarea:focus-visible {
   .workspace__output {
     position: static;
     min-height: 0;
+    scroll-margin-top: calc(var(--header-height) + 1rem);
+  }
+
+  /* Below the form, an empty result box only adds scrolling. */
+  .workspace__output--idle {
+    display: none;
   }
 }
 
@@ -875,7 +1077,7 @@ textarea:focus-visible {
 
 .annotate-toolbar {
   position: sticky;
-  top: 0;
+  top: var(--header-height);
   z-index: 2;
   display: grid;
   gap: 0.5rem;
@@ -1075,8 +1277,8 @@ textarea:focus-visible {
     font-size: 1.0625rem;
   }
 
-  .tool-grid {
-    grid-template-columns: 1fr;
+  .tool-grid li {
+    flex-basis: 100%;
   }
 
   .panel {
