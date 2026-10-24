@@ -1,22 +1,29 @@
-import { Fragment, useState } from 'react';
-import { ToolSelector } from './components/ToolSelector';
-import { toolGroups, tools } from './tools';
+import { useEffect } from 'react';
+import { HomePage } from './components/HomePage';
+import { SiteHeader } from './components/SiteHeader';
+import { ToolPage } from './components/ToolPage';
+import { useTheme } from './features/theme/useTheme';
+import { useHashRoute } from './features/useHashRoute';
+import { tools } from './tools';
 
 function App() {
-  const [selectedId, setSelectedId] = useState(tools[0].id);
-  const selected = tools.find(({ id }) => id === selectedId) ?? tools[0];
+  const { theme, toggleTheme } = useTheme();
+  const route = useHashRoute();
+  const tool = tools.find(({ id }) => id === route);
+
+  useEffect(() => {
+    document.title = tool ? `${tool.label} | Fileo` : 'Fileo: free file converter and PDF editor';
+    window.scrollTo(0, 0);
+  }, [tool]);
 
   return (
-    <main className="app">
-      <header>
-        <h1>Fileo</h1>
-        <p className="app__tagline">
-          Free, privacy-first file converter. Your files never leave your device.
-        </p>
-      </header>
-      <ToolSelector groups={toolGroups} selectedId={selected.id} onSelect={setSelectedId} />
-      <Fragment key={selected.id}>{selected.render()}</Fragment>
-    </main>
+    <>
+      <SiteHeader theme={theme} onToggleTheme={toggleTheme} />
+      {tool ? <ToolPage key={tool.id} tool={tool} /> : <HomePage />}
+      <footer className="site-footer">
+        <p>Fileo is free to use. Your files are processed on your device and never uploaded.</p>
+      </footer>
+    </>
   );
 }
 

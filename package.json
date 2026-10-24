@@ -12,6 +12,8 @@
     "typecheck": "tsc -b"
   },
   "dependencies": {
+    "@fontsource-variable/hanken-grotesk": "^5.3.0",
+    "@fontsource-variable/newsreader": "^5.3.0",
     "docx": "^9.14.0",
     "dompurify": "^3.4.17",
     "fflate": "^0.8.3",
