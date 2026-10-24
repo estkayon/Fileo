@@ -59,6 +59,17 @@ function renderShape(annotation: Annotation) {
         </>
       );
     }
+    case 'image':
+      return (
+        <image
+          href={annotation.asset.url}
+          x={annotation.x}
+          y={annotation.y}
+          width={annotation.width}
+          height={annotation.height}
+          preserveAspectRatio="none"
+        />
+      );
     case 'highlight':
       return (
         <rect

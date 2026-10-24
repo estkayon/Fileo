@@ -3,8 +3,12 @@ const DEFAULT_QUALITY = 0.92;
 interface RenderOptions {
   mimeType: string;
   quality?: number;
+  /** Resize so the longest side is exactly this many pixels. */
   longestSide?: number;
+  /** Shrink the image if its longest side is bigger than this. Never enlarges. */
+  maxSide?: number;
 }
+
 export function canvasToBlob(
   canvas: HTMLCanvasElement,
   mimeType: string,
@@ -37,11 +41,16 @@ async function decodeImage(file: File): Promise<ImageBitmap> {
 
 export async function renderImage(
   file: File,
-  { mimeType, quality = DEFAULT_QUALITY, longestSide }: RenderOptions,
+  { mimeType, quality = DEFAULT_QUALITY, longestSide, maxSide }: RenderOptions,
 ): Promise<Blob> {
   const bitmap = await decodeImage(file);
   try {
-    const scale = longestSide ? longestSide / Math.max(bitmap.width, bitmap.height) : 1;
+    const largestSide = Math.max(bitmap.width, bitmap.height);
+    const scale = longestSide
+      ? longestSide / largestSide
+      : maxSide
+        ? Math.min(1, maxSide / largestSide)
+        : 1;
     const canvas = document.createElement('canvas');
     canvas.width = Math.max(1, Math.round(bitmap.width * scale));
     canvas.height = Math.max(1, Math.round(bitmap.height * scale));

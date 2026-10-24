@@ -1,7 +1,8 @@
-import type {
-  AnnotationSettings,
-  AnnotationTool,
-  ColorTool,
+import {
+  isColorTool,
+  isStampTool,
+  type AnnotationSettings,
+  type AnnotationTool,
 } from '../features/pdf/annotate/annotationModel';
 
 interface ToolOption {
@@ -14,6 +15,12 @@ const TOOL_OPTIONS: ToolOption[] = [
   { tool: 'text', label: 'Text', hint: 'Click on a page, type, then click outside to place it.' },
   { tool: 'draw', label: 'Draw', hint: 'Press and drag on a page to draw.' },
   { tool: 'highlight', label: 'Highlight', hint: 'Drag over an area to highlight it.' },
+  { tool: 'image', label: 'Image', hint: 'Choose an image, then click on a page to place it.' },
+  {
+    tool: 'signature',
+    label: 'Signature',
+    hint: 'Draw your signature, then click on a page to place it.',
+  },
   { tool: 'erase', label: 'Erase', hint: 'Click something you added to remove it.' },
 ];
 
@@ -22,17 +29,21 @@ interface AnnotationToolbarProps {
   canUndo: boolean;
   onChange: (settings: AnnotationSettings) => void;
   onUndo: () => void;
+  onImageFile: (file: File) => void;
+  onDrawSignature: () => void;
 }
 
-export function AnnotationToolbar({ settings, canUndo, onChange, onUndo }: AnnotationToolbarProps) {
+export function AnnotationToolbar({
+  settings,
+  canUndo,
+  onChange,
+  onUndo,
+  onImageFile,
+  onDrawSignature,
+}: AnnotationToolbarProps) {
   const { tool } = settings;
   const hint = TOOL_OPTIONS.find((option) => option.tool === tool)?.hint;
-
-  const setColor = (color: string) => {
-    if (tool === 'erase') return;
-    const colorTool: ColorTool = tool;
-    onChange({ ...settings, colors: { ...settings.colors, [colorTool]: color } });
-  };
+  const stamp = isStampTool(tool) ? settings.assets[tool] : null;
 
   return (
     <div className="annotate-toolbar" role="toolbar" aria-label="Editing tools">
@@ -54,13 +65,18 @@ export function AnnotationToolbar({ settings, canUndo, onChange, onUndo }: Annot
       </div>
 
       <div className="annotate-toolbar__row">
-        {tool !== 'erase' && (
+        {isColorTool(tool) && (
           <label className="annotate-toolbar__field">
             <span>Color</span>
             <input
               type="color"
               value={settings.colors[tool]}
-              onChange={(event) => setColor(event.target.value)}
+              onChange={(event) =>
+                onChange({
+                  ...settings,
+                  colors: { ...settings.colors, [tool]: event.target.value },
+                })
+              }
             />
           </label>
         )}
@@ -93,6 +109,45 @@ export function AnnotationToolbar({ settings, canUndo, onChange, onUndo }: Annot
             />
             <output>{settings.strokeWidth}</output>
           </label>
+        )}
+        {tool === 'image' && (
+          <label className="tool">
+            {stamp ? 'Change image' : 'Choose image'}
+            <input
+              type="file"
+              accept="image/*"
+              className="visually-hidden"
+              onChange={(event) => {
+                const [file] = event.target.files ?? [];
+                if (file) onImageFile(file);
+                event.target.value = '';
+              }}
+            />
+          </label>
+        )}
+        {tool === 'signature' && (
+          <button type="button" className="tool" onClick={onDrawSignature}>
+            {stamp ? 'Redraw signature' : 'Draw signature'}
+          </button>
+        )}
+        {stamp && (
+          <>
+            <img className="stamp-preview" src={stamp.url} alt="Selected" />
+            <label className="annotate-toolbar__field">
+              <span>Width</span>
+              <input
+                type="range"
+                min={5}
+                max={100}
+                step={1}
+                value={settings.stampWidth}
+                onChange={(event) =>
+                  onChange({ ...settings, stampWidth: Number(event.target.value) })
+                }
+              />
+              <output>{settings.stampWidth}%</output>
+            </label>
+          </>
         )}
       </div>
 

@@ -1,15 +1,51 @@
 import { useState } from 'react';
-import { DEFAULT_SETTINGS } from '../features/pdf/annotate/annotationModel';
+import {
+  DEFAULT_SETTINGS,
+  type AnnotationSettings,
+  type StampTool,
+} from '../features/pdf/annotate/annotationModel';
 import { buildAnnotatedPdf } from '../features/pdf/annotate/buildAnnotatedPdf';
+import { prepareImage, type PreparedImage } from '../features/pdf/annotate/imageAsset';
+import { useImageAssets } from '../features/pdf/annotate/useImageAssets';
 import { usePdfAnnotator } from '../features/pdf/annotate/usePdfAnnotator';
 import { AnnotatablePage } from './AnnotatablePage';
 import { AnnotationToolbar } from './AnnotationToolbar';
 import { AsyncDownloadButton } from './AsyncDownloadButton';
 import { Dropzone } from './Dropzone';
+import { SignaturePad } from './SignaturePad';
 
 export function AnnotatePanel() {
   const { state, load, add, remove, undo } = usePdfAnnotator();
+  const createAsset = useImageAssets();
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [isSigning, setIsSigning] = useState(false);
+  const [imageError, setImageError] = useState('');
+
+  const handleSettingsChange = (next: AnnotationSettings) => {
+    if (next.tool !== settings.tool) {
+      setIsSigning(next.tool === 'signature' && !next.assets.signature);
+    }
+    setSettings(next);
+  };
+
+  const setAsset = (tool: StampTool, prepared: PreparedImage) => {
+    const asset = createAsset(prepared);
+    setSettings((current) => ({ ...current, assets: { ...current.assets, [tool]: asset } }));
+  };
+
+  const handleImageFile = async (file: File) => {
+    setImageError('');
+    try {
+      setAsset('image', await prepareImage(file));
+    } catch (error) {
+      setImageError(error instanceof Error ? error.message : 'Could not open this image.');
+    }
+  };
+
+  const handleSignature = (signature: PreparedImage) => {
+    setAsset('signature', signature);
+    setIsSigning(false);
+  };
 
   return (
     <section className="panel">
@@ -30,9 +66,15 @@ export function AnnotatePanel() {
           <AnnotationToolbar
             settings={settings}
             canUndo={state.annotations.length > 0}
-            onChange={setSettings}
+            onChange={handleSettingsChange}
             onUndo={undo}
+            onImageFile={handleImageFile}
+            onDrawSignature={() => setIsSigning(true)}
           />
+          {imageError && <p role="alert">{imageError}</p>}
+          {isSigning && (
+            <SignaturePad onUse={handleSignature} onCancel={() => setIsSigning(false)} />
+          )}
 
           <ol className="annotate-pages">
             {state.pages.map((page, pageIndex) => (

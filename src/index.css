@@ -560,3 +560,51 @@ input:focus-visible {
   overflow: hidden;
   user-select: text;
 }
+
+.tool:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.stamp-preview {
+  max-width: 6rem;
+  height: 2rem;
+  padding: 0.125rem;
+  border: 1px solid var(--border);
+  border-radius: 0.25rem;
+  background: #fff;
+  object-fit: contain;
+}
+
+.annotation-layer--image,
+.annotation-layer--signature {
+  cursor: copy;
+}
+
+.signature-pad {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.signature-pad__canvas {
+  width: 100%;
+  aspect-ratio: 3 / 1;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.signature-pad .signature-pad__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.signature-pad__actions .action {
+  width: auto;
+  margin: 0;
+  padding: 0.4rem 0.85rem;
+}

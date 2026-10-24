@@ -1,11 +1,23 @@
-import type { PDFFont, PDFPage } from 'pdf-lib';
+import type { PDFDocument, PDFFont, PDFImage, PDFPage } from 'pdf-lib';
 import { buildFileName } from '../../../lib/fileName';
 import type { ConversionResult } from '../../../types/converter';
 import { normalizeRotation } from '../organize/pageModel';
 import { readPdf, savePdf } from '../pdfUtils';
-import { splitLines, TEXT_BASELINE, TEXT_LINE_HEIGHT, type Annotation } from './annotationModel';
+import {
+  splitLines,
+  TEXT_BASELINE,
+  TEXT_LINE_HEIGHT,
+  type Annotation,
+  type ImageAsset,
+} from './annotationModel';
 
 type PdfLib = typeof import('pdf-lib');
+
+interface DrawContext {
+  pdfLib: PdfLib;
+  font: PDFFont;
+  embedImage: (asset: ImageAsset) => Promise<PDFImage>;
+}
 
 const UNSUPPORTED_TEXT_MESSAGE =
   'Some text uses characters that cannot be saved yet. Use English letters, numbers and common symbols.';
@@ -37,23 +49,50 @@ function parseColor({ rgb }: PdfLib, hex: string) {
   return rgb(((value >> 16) & 255) / 255, ((value >> 8) & 255) / 255, (value & 255) / 255);
 }
 
-function drawAnnotation(pdfLib: PdfLib, page: PDFPage, font: PDFFont, annotation: Annotation) {
+/** Embeds each image once, even when it is placed several times. */
+function createImageEmbedder(pdf: PDFDocument) {
+  const embedded = new Map<string, Promise<PDFImage>>();
+
+  return (asset: ImageAsset): Promise<PDFImage> => {
+    let image = embedded.get(asset.id);
+    if (!image) {
+      image = asset.blob
+        .arrayBuffer()
+        .then((bytes) =>
+          asset.mimeType === 'image/png' ? pdf.embedPng(bytes) : pdf.embedJpg(bytes),
+        );
+      embedded.set(asset.id, image);
+    }
+    return image;
+  };
+}
+
+async function drawAnnotation(
+  { pdfLib, font, embedImage }: DrawContext,
+  page: PDFPage,
+  annotation: Annotation,
+) {
   const { rotation, scale, toPage } = createPageMapper(page);
-  const color = parseColor(pdfLib, annotation.color);
 
   switch (annotation.kind) {
     case 'text': {
+      const color = parseColor(pdfLib, annotation.color);
       const size = annotation.fontSize * scale;
       splitLines(annotation.text).forEach((line, index) => {
         if (!line) return;
         const baseline =
           annotation.y + annotation.fontSize * (TEXT_BASELINE + index * TEXT_LINE_HEIGHT);
         const { x, y } = toPage(annotation.x * scale, baseline * scale);
-        page.drawText(line, { x, y, size, font, color, rotate: pdfLib.degrees(rotation) });
+        try {
+          page.drawText(line, { x, y, size, font, color, rotate: pdfLib.degrees(rotation) });
+        } catch {
+          throw new Error(UNSUPPORTED_TEXT_MESSAGE);
+        }
       });
       break;
     }
     case 'draw': {
+      const color = parseColor(pdfLib, annotation.color);
       const points = annotation.points.map((point) => toPage(point.x * scale, point.y * scale));
       for (let index = 1; index < points.length; index += 1) {
         page.drawLine({
@@ -77,9 +116,22 @@ function drawAnnotation(pdfLib: PdfLib, page: PDFPage, font: PDFFont, annotation
         y: Math.min(first.y, second.y),
         width: Math.abs(second.x - first.x),
         height: Math.abs(second.y - first.y),
-        color,
+        color: parseColor(pdfLib, annotation.color),
         // Multiply keeps the text under the highlight readable.
         blendMode: pdfLib.BlendMode.Multiply,
+      });
+      break;
+    }
+    case 'image': {
+      const image = await embedImage(annotation.asset);
+      // pdf-lib places an image by its bottom-left corner and rotates it around that corner.
+      const { x, y } = toPage(annotation.x * scale, (annotation.y + annotation.height) * scale);
+      page.drawImage(image, {
+        x,
+        y,
+        width: annotation.width * scale,
+        height: annotation.height * scale,
+        rotate: pdfLib.degrees(rotation),
       });
       break;
     }
@@ -93,16 +145,16 @@ export async function buildAnnotatedPdf(
   if (annotations.length === 0) throw new Error('Add something to the PDF before saving.');
 
   const [pdfLib, pdf] = await Promise.all([import('pdf-lib'), readPdf(file)]);
-  const font = await pdf.embedFont(pdfLib.StandardFonts.Helvetica);
+  const context: DrawContext = {
+    pdfLib,
+    font: await pdf.embedFont(pdfLib.StandardFonts.Helvetica),
+    embedImage: createImageEmbedder(pdf),
+  };
   const pages = pdf.getPages();
 
-  try {
-    for (const annotation of annotations) {
-      const page = pages[annotation.pageIndex];
-      if (page) drawAnnotation(pdfLib, page, font, annotation);
-    }
-  } catch {
-    throw new Error(UNSUPPORTED_TEXT_MESSAGE);
+  for (const annotation of annotations) {
+    const page = pages[annotation.pageIndex];
+    if (page) await drawAnnotation(context, page, annotation);
   }
 
   return {

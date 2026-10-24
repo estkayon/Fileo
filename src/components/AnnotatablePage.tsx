@@ -1,9 +1,11 @@
 import { useState, type MouseEvent, type PointerEvent } from 'react';
 import {
   createAnnotationId,
+  isStampTool,
   toPageUnits,
   type Annotation,
   type AnnotationSettings,
+  type ImageAsset,
   type PageImage,
   type Point,
 } from '../features/pdf/annotate/annotationModel';
@@ -119,8 +121,31 @@ export function AnnotatablePage({
     }
   };
 
+  const placeImage = (center: Point, asset: ImageAsset) => {
+    const width = settings.stampWidth / 100;
+    const height = width / asset.aspectRatio;
+    const pageHeight = 1 / page.aspectRatio;
+
+    onAdd({
+      id: createAnnotationId(),
+      kind: 'image',
+      pageIndex,
+      x: clamp(center.x - width / 2, 1 - width),
+      y: clamp(center.y - height / 2, Math.max(0, pageHeight - height)),
+      width,
+      height,
+      asset,
+    });
+  };
+
   const handleClick = (event: MouseEvent<SVGSVGElement>) => {
-    if (tool === 'text') setEditorAt(pointFromEvent(event));
+    if (tool === 'text') {
+      setEditorAt(pointFromEvent(event));
+      return;
+    }
+
+    const asset = isStampTool(tool) ? settings.assets[tool] : null;
+    if (asset) placeImage(pointFromEvent(event), asset);
   };
 
   const commitText = (text: string) => {
