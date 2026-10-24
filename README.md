@@ -17,6 +17,8 @@ Your files never leave your device.
 ![No uploads](https://img.shields.io/badge/uploads-none-3a8f5c?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-5f7425?style=flat-square)
 
+### [🌐 Open Fileo](https://fileo.estiakayon.workers.dev)
+
 [Features](#features) · [Screenshots](#screenshots) · [Getting started](#getting-started) · [How it works](#how-it-works) · [Project structure](#project-structure)
 
 </div>
