@@ -414,3 +414,149 @@ input:focus-visible {
   justify-content: center;
   gap: 0.25rem;
 }
+
+.annotate-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.annotate-toolbar__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.annotate-toolbar__row:first-child {
+  gap: 0.5rem;
+}
+
+.annotate-toolbar__row:empty {
+  display: none;
+}
+
+.annotate-toolbar__field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.annotate-toolbar__field input[type='range'] {
+  accent-color: var(--accent);
+}
+
+.annotate-toolbar__field output {
+  min-width: 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.annotate-toolbar .annotate-toolbar__hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.tool:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.annotate-pages {
+  display: grid;
+  gap: 1rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.annotate-pages__label {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.annotatable-page {
+  position: relative;
+  container-type: inline-size;
+  isolation: isolate;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #fff;
+  user-select: none;
+}
+
+.annotatable-page__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.annotatable-page__placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #5c5c66;
+}
+
+.annotation-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.annotation-layer--text {
+  cursor: text;
+}
+
+.annotation-layer--draw,
+.annotation-layer--highlight {
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.annotation {
+  pointer-events: none;
+}
+
+.annotation-layer--erase .annotation {
+  pointer-events: visiblePainted;
+  cursor: pointer;
+}
+
+.annotation-layer--erase .annotation:hover {
+  opacity: 0.45;
+}
+
+.annotation__text {
+  font-family: Helvetica, Arial, sans-serif;
+  white-space: pre;
+}
+
+.annotation__highlight {
+  mix-blend-mode: multiply;
+}
+
+.text-editor {
+  position: absolute;
+  min-height: 1.2em;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 1px dashed var(--accent);
+  background: transparent;
+  font-family: Helvetica, Arial, sans-serif;
+  resize: none;
+  overflow: hidden;
+  user-select: text;
+}
