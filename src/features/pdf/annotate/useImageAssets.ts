@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback } from 'react';
+import { useObjectUrls } from '../../useObjectUrls';
 import { createAnnotationId, type ImageAsset } from './annotationModel';
 import type { PreparedImage } from './imageAsset';
 
@@ -7,19 +8,14 @@ import type { PreparedImage } from './imageAsset';
  * so all URLs are released together when the editor closes.
  */
 export function useImageAssets() {
-  const urls = useRef<string[]>([]);
+  const createUrl = useObjectUrls();
 
-  useEffect(
-    () => () => {
-      urls.current.forEach((url) => URL.revokeObjectURL(url));
-      urls.current = [];
-    },
-    [],
+  return useCallback(
+    (prepared: PreparedImage): ImageAsset => ({
+      id: createAnnotationId(),
+      url: createUrl(prepared.blob),
+      ...prepared,
+    }),
+    [createUrl],
   );
-
-  return useCallback((prepared: PreparedImage): ImageAsset => {
-    const url = URL.createObjectURL(prepared.blob);
-    urls.current.push(url);
-    return { id: createAnnotationId(), url, ...prepared };
-  }, []);
 }

@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { htmlToPdf, isHtmlBlob } from '../features/document/htmlToPdf';
+import { getPreviewKind } from '../features/preview/previewKind';
 import type { ConversionItem } from '../features/runJob';
 import { downloadResult } from '../lib/download';
 import { buildFileName } from '../lib/fileName';
@@ -6,6 +8,7 @@ import { formatBytes } from '../lib/formatBytes';
 import { zipResults } from '../lib/zip';
 import type { ConversionResult } from '../types/converter';
 import { AsyncDownloadButton } from './AsyncDownloadButton';
+import { ResultPreview } from './ResultPreview';
 
 const ARCHIVE_NAME = 'fileo-converted.zip';
 
@@ -16,6 +19,7 @@ interface ResultRowProps {
 
 function ResultRow({ sourceSize, result }: ResultRowProps) {
   const isHtml = isHtmlBlob(result.blob);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   return (
     <>
@@ -26,6 +30,16 @@ function ResultRow({ sourceSize, result }: ResultRowProps) {
         </span>
       </div>
       <div className="result__actions">
+        {getPreviewKind(result) && (
+          <button
+            type="button"
+            className="action action--secondary"
+            aria-expanded={isPreviewOpen}
+            onClick={() => setIsPreviewOpen((open) => !open)}
+          >
+            {isPreviewOpen ? 'Hide preview' : 'Preview'}
+          </button>
+        )}
         <button type="button" className="action" onClick={() => downloadResult(result)}>
           {isHtml ? 'Download HTML' : 'Download'}
         </button>
@@ -40,6 +54,11 @@ function ResultRow({ sourceSize, result }: ResultRowProps) {
           />
         )}
       </div>
+      {isPreviewOpen && (
+        <div className="preview">
+          <ResultPreview result={result} />
+        </div>
+      )}
     </>
   );
 }
