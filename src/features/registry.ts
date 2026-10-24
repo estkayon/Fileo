@@ -8,6 +8,7 @@ import { imagesToPdf } from './pdf/imagesToPdf';
 import { mergePdf } from './pdf/mergePdf';
 import { pdfToImages } from './pdf/pdfToImages';
 import { pdfToText } from './pdf/pdfToText';
+import { pdfToWord } from './pdf/toWord/pdfToWord';
 import { wordToHtml } from './document/wordToHtml';
 
 export const converterGroups: ConverterGroup[] = [
@@ -38,7 +39,7 @@ export const converterGroups: ConverterGroup[] = [
   },
   {
     title: 'PDF',
-    converters: [imagesToPdf, mergePdf, extractPages, pdfToImages, pdfToText],
+    converters: [imagesToPdf, mergePdf, extractPages, pdfToImages, pdfToText, pdfToWord],
   },
   {
     title: 'Documents',
