@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 420" width="1280" height="420" role="img" aria-labelledby="title desc">
+  <title id="title">Fileo</title>
+  <desc id="desc">Fileo converts and edits files in your browser. Nothing is uploaded.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#103d2a"/>
+      <stop offset="0.55" stop-color="#1f6b4a"/>
+      <stop offset="1" stop-color="#2a8a5e"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#9be0b6" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#9be0b6" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.2" fill="#ffffff" fill-opacity="0.08"/>
+    </pattern>
+    <clipPath id="frame"><rect width="1280" height="420" rx="28"/></clipPath>
+  </defs>
+
+  <style>
+    .serif { font-family: Georgia, 'Times New Roman', serif; }
+    .sans { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+
+    .glow-a { animation: drift-a 18s ease-in-out infinite; }
+    .glow-b { animation: drift-b 22s ease-in-out infinite; }
+    .reveal { opacity: 0; animation: reveal 1.6s ease-out forwards; }
+    .reveal-2 { animation-delay: 0.5s; }
+    .reveal-3 { animation-delay: 1s; }
+    .reveal-4 { animation-delay: 1.5s; }
+    .leaf { transform-box: fill-box; transform-origin: 0% 100%; animation: sway 6s ease-in-out infinite; }
+    .arrow-top { animation: nudge-right 3.2s ease-in-out infinite; }
+    .arrow-bottom { animation: nudge-left 3.2s ease-in-out infinite; }
+    .float { animation: float 9s ease-in-out infinite; }
+    .float-2 { animation-delay: -3s; }
+    .float-3 { animation-delay: -6s; }
+    .from { animation: swap-out 8s ease-in-out infinite; }
+    .to { animation: swap-in 8s ease-in-out infinite; }
+
+    @keyframes drift-a { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(90px, 40px); } }
+    @keyframes drift-b { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-120px, -30px); } }
+    @keyframes reveal { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes sway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+    @keyframes nudge-right { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(1.2px); } }
+    @keyframes nudge-left { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-1.2px); } }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+    @keyframes swap-out { 0%, 40% { opacity: 1; } 50%, 90% { opacity: 0; } 100% { opacity: 1; } }
+    @keyframes swap-in { 0%, 40% { opacity: 0; } 50%, 90% { opacity: 1; } 100% { opacity: 0; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; }
+      .reveal { opacity: 1; }
+      .to { opacity: 0; }
+    }
+  </style>
+
+  <g clip-path="url(#frame)">
+    <rect width="1280" height="420" fill="url(#bg)"/>
+    <rect width="1280" height="420" fill="url(#dots)"/>
+    <circle class="glow-a" cx="260" cy="120" r="260" fill="url(#glow)"/>
+    <circle class="glow-b" cx="1080" cy="330" r="300" fill="url(#glow)"/>
+
+    <!-- Logo mark -->
+    <g transform="translate(96 118)">
+      <g class="reveal">
+      <g transform="scale(5.6)">
+        <path d="M8 2h11l9 9v16a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3z" fill="#f4f7f3"/>
+        <g transform="translate(19 2)">
+          <path class="leaf" d="M0 0c0 5.5 3.5 9 9 9 0-5.5-3.5-9-9-9z" fill="#7cc79a"/>
+        </g>
+        <path d="M19.6 2.6 27.4 10.4" stroke="#f4f7f3" stroke-width="0.8" stroke-linecap="round"/>
+        <g fill="none" stroke="#1f6b4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path class="arrow-top" d="M10 16.5h10.5m-3-3 3 3-3 3"/>
+          <path class="arrow-bottom" d="M22 23.5H11.5m3 3-3-3 3-3"/>
+        </g>
+      </g>
+      </g>
+    </g>
+
+    <!-- Words -->
+    <text class="serif reveal reveal-2" x="300" y="215" fill="#f4f7f3" font-size="104" font-weight="600" letter-spacing="-2">Fileo</text>
+    <text class="sans reveal reveal-3" x="304" y="268" fill="#d8efe0" font-size="27">Convert and edit files right in your browser.</text>
+    <text class="sans reveal reveal-4" x="304" y="306" fill="#a9d9bb" font-size="21">Free. Private. Nothing is uploaded.</text>
+
+    <!-- A file card that turns from PDF into DOCX -->
+    <g transform="translate(940 92)">
+      <g class="reveal reveal-3">
+      <g class="float">
+        <rect width="236" height="236" rx="22" fill="#ffffff" fill-opacity="0.1" stroke="#ffffff" stroke-opacity="0.25"/>
+        <rect x="58" y="34" width="120" height="152" rx="12" fill="#f4f7f3"/>
+        <rect x="78" y="60" width="80" height="8" rx="4" fill="#cfe3d6"/>
+        <rect x="78" y="78" width="64" height="8" rx="4" fill="#cfe3d6"/>
+        <rect x="78" y="96" width="74" height="8" rx="4" fill="#cfe3d6"/>
+        <g class="from">
+          <rect x="78" y="128" width="60" height="30" rx="7" fill="#e2f0e7"/>
+          <text class="sans" x="108" y="149" text-anchor="middle" fill="#1f6b4a" font-size="17" font-weight="700">PDF</text>
+        </g>
+        <g class="to">
+          <rect x="72" y="128" width="72" height="30" rx="7" fill="#1f6b4a"/>
+          <text class="sans" x="108" y="149" text-anchor="middle" fill="#ffffff" font-size="17" font-weight="700">DOCX</text>
+        </g>
+      </g>
+      </g>
+    </g>
+
+    <!-- Format chips drifting slowly -->
+    <g class="sans" font-size="15" font-weight="700">
+      <g transform="translate(846 74)">
+        <g class="float float-2">
+        <rect width="58" height="28" rx="8" fill="#ffffff" fill-opacity="0.14"/>
+        <text x="29" y="19" text-anchor="middle" fill="#e2f0e7">PNG</text>
+      </g>
+      </g>
+      <g transform="translate(1196 66)">
+        <g class="float float-3">
+        <rect width="52" height="28" rx="8" fill="#ffffff" fill-opacity="0.14"/>
+        <text x="26" y="19" text-anchor="middle" fill="#e2f0e7">JPG</text>
+      </g>
+      </g>
+      <g transform="translate(860 330)">
+        <g class="float">
+        <rect width="48" height="28" rx="8" fill="#ffffff" fill-opacity="0.14"/>
+        <text x="24" y="19" text-anchor="middle" fill="#e2f0e7">MD</text>
+      </g>
+      </g>
+      <g transform="translate(1196 352)">
+        <g class="float float-2">
+        <rect width="64" height="28" rx="8" fill="#ffffff" fill-opacity="0.14"/>
+        <text x="32" y="19" text-anchor="middle" fill="#e2f0e7">WEBP</text>
+      </g>
+      </g>
+    </g>
+  </g>
+</svg>
