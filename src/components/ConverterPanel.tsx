@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useConversion } from '../features/useConversion';
 import type { ConversionOptions, Converter } from '../types/converter';
+import { ConversionOutput } from './ConversionOutput';
 import { Dropzone } from './Dropzone';
 import { FileList } from './FileList';
 import { OptionsForm } from './OptionsForm';
 import { ProgressBar } from './ProgressBar';
-import { ResultList } from './ResultList';
 
 const MAX_FILES = 50;
 
@@ -47,35 +47,54 @@ export function ConverterPanel({ converter }: ConverterPanelProps) {
   };
 
   return (
-    <section className="panel">
-      <Dropzone
-        accept={converter.accept}
-        multiple={inputMode !== 'single'}
-        disabled={isConverting}
-        onFiles={handleFilesAdded}
-      />
-      {notice && <p role="status">{notice}</p>}
+    <div className="workspace">
+      <section className="panel workspace__input" aria-label="Files and options">
+        <Dropzone
+          accept={converter.accept}
+          multiple={inputMode !== 'single'}
+          disabled={isConverting}
+          onFiles={handleFilesAdded}
+        />
+        {notice && <p role="status">{notice}</p>}
 
-      <fieldset className="controls" disabled={isConverting}>
-        <FileList files={files} reorderable={inputMode === 'merge'} onChange={handleFilesChange} />
-        {converter.options && (
-          <OptionsForm options={converter.options} values={values} onChange={handleOptionsChange} />
+        <fieldset className="controls" disabled={isConverting}>
+          <FileList
+            files={files}
+            reorderable={inputMode === 'merge'}
+            onChange={handleFilesChange}
+          />
+          {converter.options && (
+            <OptionsForm
+              options={converter.options}
+              values={values}
+              onChange={handleOptionsChange}
+            />
+          )}
+        </fieldset>
+
+        <button
+          type="button"
+          className="action workspace__convert"
+          disabled={files.length === 0 || isConverting}
+          onClick={() => run(files, values)}
+        >
+          {convertLabel}
+        </button>
+      </section>
+
+      <section className="panel workspace__output" aria-label="Result" aria-live="polite">
+        {state.status === 'idle' && (
+          <p className="output__empty">
+            {files.length === 0
+              ? 'Add a file on the left, then press Convert. The result shows here.'
+              : 'Press Convert to see the result here.'}
+          </p>
         )}
-      </fieldset>
-
-      <button
-        type="button"
-        className="action"
-        disabled={files.length === 0 || isConverting}
-        onClick={() => run(files, values)}
-      >
-        {convertLabel}
-      </button>
-
-      {state.status === 'converting' && (
-        <ProgressBar progress={state.progress} completed={state.completed} total={state.total} />
-      )}
-      {state.status === 'done' && <ResultList items={state.items} />}
-    </section>
+        {state.status === 'converting' && (
+          <ProgressBar progress={state.progress} completed={state.completed} total={state.total} />
+        )}
+        {state.status === 'done' && <ConversionOutput items={state.items} />}
+      </section>
+    </div>
   );
 }

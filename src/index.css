@@ -363,7 +363,7 @@ textarea:focus-visible {
 /* ---------- Tool page ---------- */
 
 .tool-page {
-  max-width: var(--tool-width);
+  max-width: var(--page-width);
   margin: 0 auto;
   padding: 1.75rem 1.25rem 0;
 }
@@ -395,6 +395,109 @@ textarea:focus-visible {
   margin: 0.5rem 0 1.5rem;
   color: var(--muted);
   font-size: 1.0625rem;
+}
+
+/* Page editors (organize, add text) use one column. */
+.tool-page > .panel {
+  max-width: var(--tool-width);
+}
+
+/* Converters: files and options on the left, the result on the right. */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.workspace__output {
+  position: sticky;
+  top: 1rem;
+  display: grid;
+  gap: 1rem;
+  min-height: 18rem;
+}
+
+.workspace__output .output__empty {
+  align-self: center;
+  margin: 0;
+  color: var(--muted);
+  text-align: center;
+}
+
+.workspace__convert {
+  width: 100%;
+}
+
+.output__summary {
+  margin: 0;
+  color: var(--muted);
+}
+
+.output__files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.output__files .tool--failed {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.output__item {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.output__item p[role='alert'] {
+  margin: 0;
+}
+
+.output__header {
+  display: grid;
+}
+
+.output__name {
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.output__meta {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.workspace__output .preview {
+  max-height: 65vh;
+  overflow: auto;
+}
+
+.output__actions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0.5rem;
+}
+
+.workspace__output .action {
+  width: 100%;
+  margin: 0;
+}
+
+.workspace__output .progress {
+  margin: 0;
+}
+
+@media (max-width: 60rem) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .workspace__output {
+    position: static;
+    min-height: 0;
+  }
 }
 
 /* ---------- Shared controls ---------- */
@@ -599,57 +702,6 @@ textarea:focus-visible {
 .progress progress {
   width: 100%;
   accent-color: var(--primary);
-}
-
-.results {
-  display: grid;
-  gap: 0.75rem;
-  margin: 1.25rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.result {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem 1rem;
-  padding: 0.85rem 1rem;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface);
-}
-
-.result__info {
-  display: grid;
-  min-width: 0;
-}
-
-.result__name {
-  font-weight: 650;
-  overflow-wrap: anywhere;
-}
-
-.result__meta {
-  color: var(--muted);
-  font-size: 0.875rem;
-}
-
-.result__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.result__actions .action {
-  margin: 0;
-  padding: 0.45rem 1rem;
-}
-
-.result__actions [role='alert'] {
-  flex-basis: 100%;
-  margin: 0;
 }
 
 /* ---------- Preview ---------- */
